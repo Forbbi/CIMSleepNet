@@ -658,33 +658,3 @@ class CIMSleepNet(nn.Module):
         xx_EEG_EOG = xx_EEG_EOG.contiguous().view(2 * b, t, 128).unsqueeze(2)
         return x, x_EEG_g, x_EOG_g, mu, logvar, xx_EEG_EOG, score
 
-
-if __name__ == '__main__':
-    device = torch.device('cuda')
-    model = CIMSleepNet().to(device)
-
-    # model1 = MultiAutoencoder()
-    x1 = torch.randn((2, 25, 1, 3000)).to(device)
-    x2 = torch.randn((2, 25, 1, 3000)).to(device)
-    y_miss_hr = np.array([0, 1, 1, 1, 0])
-    y_miss_xyz = np.array([1, 0, 0, 1, 1])
-    y_miss_hr = torch.from_numpy(y_miss_hr).to(device)
-    y_miss_xyz = torch.from_numpy(y_miss_xyz).to(device)
-    y_miss_hr = y_miss_hr.repeat(10).to(device)
-    y_miss_xyz = y_miss_xyz.repeat(10).to(device)
-    # print(y_miss_hr.shape)
-    # out = model(x1,x2)
-    out1, out2, out3, out4, out5, out6, score = model(x1, x2, y_miss_hr, y_miss_xyz)
-    print(out1.shape)
-    print(out2.shape)
-    print(out3.shape)
-    print(out4.shape)
-    print(out5.shape)
-    print(out6.shape)
-    flops, params = profile(model, inputs=(x1, x2, y_miss_hr, y_miss_xyz,))
-    #print(f"运算量：{flops}, 参数量：{params}")
-
-    # 将结果转换为更易于阅读的格式
-    flops, params = clever_format([flops, params], '%.3f')
-
-    print(f"运算量：{flops}, 参数量：{params}")
